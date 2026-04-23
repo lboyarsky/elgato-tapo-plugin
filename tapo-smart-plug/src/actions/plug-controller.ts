@@ -20,19 +20,28 @@ export type ActionProxy = {
 };
 
 export const SVG_ON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144">
-  <circle cx="72" cy="72" r="72" fill="#2ECC71"/>
-  <rect x="54" y="28" width="12" height="36" rx="4" fill="white"/>
-  <rect x="78" y="28" width="12" height="36" rx="4" fill="white"/>
-  <path d="M44 72 C44 99.6 55.6 116 72 116 C88.4 116 100 99.6 100 72 L44 72 Z" fill="white"/>
-  <rect x="66" y="116" width="12" height="16" rx="4" fill="white"/>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0d2a1a"/>
+      <stop offset="100%" stop-color="#080d0a"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="144" height="144" rx="20" fill="url(#bg)"/>
+  <circle cx="72" cy="80" r="42" fill="none" stroke="#00e676" stroke-width="18" stroke-opacity="0.08"/>
+  <path d="M 49 57 A 32 32 0 1 1 95 57" fill="none" stroke="#00e676" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <line x1="72" y1="40" x2="72" y2="66" stroke="#00e676" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <text x="72" y="128" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="18" font-weight="700" fill="#00e676" letter-spacing="3">ON</text>
 </svg>`;
 
 export const SVG_OFF = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144">
-  <circle cx="72" cy="72" r="72" fill="#555555"/>
-  <rect x="54" y="28" width="12" height="36" rx="4" fill="#AAAAAA"/>
-  <rect x="78" y="28" width="12" height="36" rx="4" fill="#AAAAAA"/>
-  <path d="M44 72 C44 99.6 55.6 116 72 116 C88.4 116 100 99.6 100 72 L44 72 Z" fill="#AAAAAA"/>
-  <rect x="66" y="116" width="12" height="16" rx="4" fill="#AAAAAA"/>
+  <rect width="144" height="144" rx="20" fill="#0a0a0a"/>
+  <path d="M 49 57 A 32 32 0 1 1 95 57" fill="none" stroke="#3a3a3a" stroke-width="8" stroke-linecap="round"/>
+  <line x1="72" y1="40" x2="72" y2="66" stroke="#3a3a3a" stroke-width="8" stroke-linecap="round"/>
+  <text x="72" y="128" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="18" font-weight="700" fill="#3a3a3a" letter-spacing="3">OFF</text>
 </svg>`;
 
 export function svgDataUri(svg: string): string {
@@ -41,6 +50,7 @@ export function svgDataUri(svg: string): string {
 
 export async function getCredentials(): Promise<{ email: string; password: string }> {
     const globals = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
+    streamDeck.logger.debug("Global settings received:", JSON.stringify(globals));
     const { email, password } = globals;
     if (!email || !password) {
         throw new Error("Tapo credentials not configured in plugin settings");
@@ -66,7 +76,8 @@ export async function syncState(action: ActionProxy, settings: PlugSettings): Pr
         const isOn = info.device_on ?? false;
         await action.setSettings({ ...settings, isOn });
         if (action.isKey()) await action.setState(isOn ? 1 : 0);
-    } catch {
+    } catch (err) {
+        streamDeck.logger.error("syncState failed:", err);
         await action.showAlert();
     }
 }
@@ -88,7 +99,8 @@ export async function togglePlug(action: ActionProxy, settings: PlugSettings): P
         const newIsOn = !settings.isOn;
         await action.setSettings({ ...settings, isOn: newIsOn });
         if (action.isKey()) await action.setState(newIsOn ? 1 : 0);
-    } catch {
+    } catch (err) {
+        streamDeck.logger.error("togglePlug failed:", err);
         await action.showAlert();
     }
 }

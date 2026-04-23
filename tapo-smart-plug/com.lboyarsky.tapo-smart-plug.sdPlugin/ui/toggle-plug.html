@@ -4,32 +4,102 @@
 <head lang="en">
     <title>Tapo Smart Plug Settings</title>
     <meta charset="utf-8" />
-    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
     <style>
-        .section-label {
+        body {
+            font-family: "Segoe UI", sans-serif;
+            font-size: 13px;
+            color: #d8d8d8;
+            background: #2d2d2d;
+            margin: 0;
+            padding: 8px;
+        }
+        label {
+            display: block;
             color: #969696;
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            padding: 8px 0 2px 0;
+            margin: 10px 0 3px;
         }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            background: #1a1a1a;
+            border: 1px solid #4a4a4a;
+            border-radius: 3px;
+            color: #d8d8d8;
+            padding: 5px 7px;
+            font-size: 13px;
+        }
+        input:focus { outline: none; border-color: #0078ff; }
+        .section { color: #0078ff; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin: 14px 0 4px; }
     </style>
 </head>
 
 <body>
-    <div class="section-label">Device</div>
-    <sdpi-item label="IP Address">
-        <sdpi-textfield setting="ip" placeholder="e.g. 192.168.1.123"></sdpi-textfield>
-    </sdpi-item>
+    <div class="section">Device</div>
+    <label>IP Address</label>
+    <input id="ip" type="text" placeholder="e.g. 192.168.1.123" />
 
-    <div class="section-label">Tapo Account (shared across all keys)</div>
-    <sdpi-item label="Email">
-        <sdpi-textfield globalsetting="email" placeholder="your@email.com"></sdpi-textfield>
-    </sdpi-item>
-    <sdpi-item label="Password">
-        <sdpi-textfield globalsetting="password" type="password" placeholder="••••••••"></sdpi-textfield>
-    </sdpi-item>
+    <div class="section">Tapo Account (shared across all keys)</div>
+    <label>Email</label>
+    <input id="email" type="email" placeholder="your@email.com" />
+    <label>Password</label>
+    <input id="password" type="password" placeholder="••••••••" />
+
+    <script>
+        let ws, actionInfo, uuid;
+
+        function connectElgatoStreamDeckSocket(port, pluginUUID, registerEvent, info, actionInfoStr) {
+            uuid = pluginUUID;
+            actionInfo = JSON.parse(actionInfoStr);
+
+            ws = new WebSocket("ws://127.0.0.1:" + port);
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ event: registerEvent, uuid }));
+                ws.send(JSON.stringify({ event: "getSettings", context: uuid }));
+                ws.send(JSON.stringify({ event: "getGlobalSettings", context: uuid }));
+            };
+
+            ws.onmessage = (evt) => {
+                const msg = JSON.parse(evt.data);
+                if (msg.event === "didReceiveSettings") {
+                    const s = msg.payload.settings || {};
+                    document.getElementById("ip").value = s.ip || "";
+                }
+                if (msg.event === "didReceiveGlobalSettings") {
+                    const s = msg.payload.settings || {};
+                    document.getElementById("email").value = s.email || "";
+                    document.getElementById("password").value = s.password || "";
+                }
+            };
+        }
+
+        function saveSettings() {
+            const ip = document.getElementById("ip").value.trim();
+            ws.send(JSON.stringify({
+                event: "setSettings",
+                context: uuid,
+                payload: { ip }
+            }));
+        }
+
+        function saveGlobalSettings() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            ws.send(JSON.stringify({
+                event: "setGlobalSettings",
+                context: uuid,
+                payload: { email, password }
+            }));
+        }
+
+        document.getElementById("ip").addEventListener("change", saveSettings);
+        document.getElementById("email").addEventListener("change", saveGlobalSettings);
+        document.getElementById("password").addEventListener("change", saveGlobalSettings);
+    </script>
 </body>
 
 </html>
