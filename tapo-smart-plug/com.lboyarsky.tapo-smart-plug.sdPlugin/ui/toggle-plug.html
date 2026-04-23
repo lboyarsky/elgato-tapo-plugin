@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Tapo Smart Plug Settings</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+    <style>
+        .section-label {
+            color: #969696;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 8px 0 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="section-label">Device</div>
+    <sdpi-item label="IP Address">
+        <sdpi-textfield setting="ip" placeholder="e.g. 192.168.1.123"></sdpi-textfield>
+    </sdpi-item>
+
+    <div class="section-label">Tapo Account (shared across all keys)</div>
+    <sdpi-item label="Email">
+        <sdpi-textfield globalsetting="email" placeholder="your@email.com"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Password">
+        <sdpi-textfield globalsetting="password" type="password" placeholder="••••••••"></sdpi-textfield>
+    </sdpi-item>
+</body>
+
+</html>

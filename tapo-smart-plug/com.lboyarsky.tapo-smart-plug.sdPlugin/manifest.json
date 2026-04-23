@@ -1,0 +1,52 @@
+{
+	"Name": "Tapo Smart Plug",
+	"Version": "0.1.0.0",
+	"Author": "lboyarsky",
+	"Actions": [
+		{
+			"Name": "Toggle Plug",
+			"UUID": "com.lboyarsky.tapo-smart-plug.toggle",
+			"Icon": "imgs/actions/toggle/icon",
+			"Tooltip": "Toggles a Tapo smart plug on or off. Shows live state on the key.",
+			"PropertyInspectorPath": "ui/toggle-plug.html",
+			"DisableAutomaticStates": true,
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/toggle/key",
+					"Name": "Off"
+				},
+				{
+					"Image": "imgs/actions/toggle/key",
+					"Name": "On"
+				}
+			]
+		}
+	],
+	"Category": "Tapo Smart Plug",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Control TP-Link Tapo smart plugs (P105, P115) directly from your Stream Deck",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "7.1"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "24",
+		"Debug": "enabled"
+	},
+	"UUID": "com.lboyarsky.tapo-smart-plug"
+}
