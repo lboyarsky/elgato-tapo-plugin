@@ -31,6 +31,9 @@ Control TP-Link Tapo smart plugs (P105, P115) directly from your Elgato Stream D
 
 ## Configuration
 
+> [!IMPORTANT]
+> **Third-Party Compatibility must be enabled** in your Tapo account before this plugin can connect to your devices. In the Tapo app, go to **Me → App Settings → Third-Party Compatibility** and turn it on. Without this, all connection attempts will fail.
+
 ### 1 — Enter your Tapo credentials
 
 Open any key's Property Inspector (right-click the key → *Settings*). Fill in:
