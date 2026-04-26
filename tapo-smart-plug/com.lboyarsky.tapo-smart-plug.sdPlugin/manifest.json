@@ -10,17 +10,20 @@
 			"Tooltip": "Toggles a Tapo smart plug on or off. Shows live state on the key.",
 			"PropertyInspectorPath": "ui/toggle-plug.html",
 			"DisableAutomaticStates": true,
+			"UserTitleEnabled": false,
 			"Controllers": [
 				"Keypad"
 			],
 			"States": [
 				{
 					"Image": "imgs/actions/toggle/key",
-					"Name": "Off"
+					"Name": "Off",
+					"ShowTitle": false
 				},
 				{
 					"Image": "imgs/actions/toggle/key",
-					"Name": "On"
+					"Name": "On",
+					"ShowTitle": false
 				}
 			]
 		}

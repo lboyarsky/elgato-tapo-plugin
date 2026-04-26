@@ -10,10 +10,22 @@ vi.mock("@elgato/streamdeck", () => ({
         settings: {
             getGlobalSettings: vi.fn(),
         },
+        logger: {
+            debug: vi.fn(),
+            error: vi.fn(),
+        },
     },
 }));
 
-import { syncState, togglePlug, svgDataUri, SVG_ON, SVG_OFF } from "../actions/plug-controller";
+vi.mock("fs", () => ({
+    readFileSync: vi.fn().mockReturnValue(Buffer.from("fakepng")),
+}));
+
+vi.mock("url", () => ({
+    fileURLToPath: vi.fn().mockReturnValue("/fake/bin/plugin.js"),
+}));
+
+import { syncState, togglePlug } from "../actions/plug-controller";
 import { loginDeviceByIp } from "tp-link-tapo-connect";
 import streamDeck from "@elgato/streamdeck";
 
@@ -38,13 +50,6 @@ function makeAction(isKey = true) {
     };
 }
 
-describe("svgDataUri", () => {
-    it("returns a valid SVG data URI", () => {
-        const uri = svgDataUri("<svg/>");
-        expect(uri).toMatch(/^data:image\/svg\+xml;base64,/);
-    });
-});
-
 describe("syncState", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -58,8 +63,8 @@ describe("syncState", () => {
 
         await syncState(action, { ip: "192.168.1.123" });
 
-        expect(action.setImage).toHaveBeenCalledWith(svgDataUri(SVG_OFF), { state: 0 });
-        expect(action.setImage).toHaveBeenCalledWith(svgDataUri(SVG_ON), { state: 1 });
+        expect(action.setImage).toHaveBeenCalledWith(expect.stringMatching(/^data:image\/png;base64,/), { state: 0 });
+        expect(action.setImage).toHaveBeenCalledWith(expect.stringMatching(/^data:image\/png;base64,/), { state: 1 });
     });
 
     it("sets state to OFF (0) when device is off", async () => {

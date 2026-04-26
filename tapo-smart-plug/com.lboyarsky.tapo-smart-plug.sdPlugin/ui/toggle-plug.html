@@ -22,7 +22,7 @@
             text-transform: uppercase;
             margin: 10px 0 3px;
         }
-        input {
+        input, select {
             width: 100%;
             box-sizing: border-box;
             background: #1a1a1a;
@@ -32,7 +32,7 @@
             padding: 5px 7px;
             font-size: 13px;
         }
-        input:focus { outline: none; border-color: #0078ff; }
+        input:focus, select:focus { outline: none; border-color: #0078ff; }
         .section { color: #0078ff; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin: 14px 0 4px; }
     </style>
 </head>
@@ -41,6 +41,11 @@
     <div class="section">Device</div>
     <label>IP Address</label>
     <input id="ip" type="text" placeholder="e.g. 192.168.1.123" />
+    <label>Icon Style</label>
+    <select id="iconStyle">
+        <option value="power">⚡ Power Button</option>
+        <option value="lamp">💡 Lamp</option>
+    </select>
 
     <div class="section">Tapo Account (shared across all keys)</div>
     <label>Email</label>
@@ -68,6 +73,7 @@
                 if (msg.event === "didReceiveSettings") {
                     const s = msg.payload.settings || {};
                     document.getElementById("ip").value = s.ip || "";
+                    document.getElementById("iconStyle").value = s.iconStyle || "power";
                 }
                 if (msg.event === "didReceiveGlobalSettings") {
                     const s = msg.payload.settings || {};
@@ -79,10 +85,11 @@
 
         function saveSettings() {
             const ip = document.getElementById("ip").value.trim();
+            const iconStyle = document.getElementById("iconStyle").value;
             ws.send(JSON.stringify({
                 event: "setSettings",
                 context: uuid,
-                payload: { ip }
+                payload: { ip, iconStyle }
             }));
         }
 
@@ -97,6 +104,7 @@
         }
 
         document.getElementById("ip").addEventListener("change", saveSettings);
+        document.getElementById("iconStyle").addEventListener("change", saveSettings);
         document.getElementById("email").addEventListener("change", saveGlobalSettings);
         document.getElementById("password").addEventListener("change", saveGlobalSettings);
     </script>
